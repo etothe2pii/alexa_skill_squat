@@ -3,6 +3,8 @@ import os
 import time
 from datetime import datetime
 
+from argparse import ArgumentParser
+
 def get_time():
     return datetime.now().strftime("%H_%M_%S")
 
@@ -37,7 +39,7 @@ def extract_text(directory, output_directory):
             f = files.pop(0)
             f_path = f"{directory}{f}"
             parse_file(model, f_path, output_directory)
-            os.rename(f_path, f"used_audio/{f}")
+            os.rename(f_path, f"used_alexa/{f}")
 
             count += 1
         
@@ -48,7 +50,21 @@ def extract_text(directory, output_directory):
 
 if __name__ == "__main__":
 
-    extract_text("../AVS/word_transcribe/", "word_raw_text/")
+
+    parser = ArgumentParser()
+
+    parser.add_argument("input_directory", help = "Audio Samples for transcription.")
+    parser.add_argument("output_directory", help = "Alexa samples")
+
+    
+
+    args = parser.parse_args()
+
+
+    if not os.path.exists(args.output_directory):
+        os.mkdir(args.output_directory)
+
+    extract_text(args.input_directory, args.output_directory)
 
 
 

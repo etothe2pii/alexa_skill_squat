@@ -11,6 +11,8 @@ import h2
 
 from  loop_timer import Looper
 
+from argparse import ArgumentParser
+
 # client = AlexaClient(
 #     client_id='amzn1.application-oa2-client.1ef94c1474bc43a58f4f699037173ce3',
 #     secret="amzn1.oa2-cs.v1.5f73d27b79af4c59865a3adfc68499bdbfb17e3fc831ae962ba2babd0591527b",
@@ -88,7 +90,10 @@ def record_session(client, audios):
 ====================================
 '''
 
-def run_test(client, directory, logger):
+def run_test(client, directory, logger, output):
+
+    global output_dir
+    output_dir = output
 
     
     p = sp.Popen(f"convert_audio/convert_to_mono.sh {directory} converted_audio/", shell=True)
@@ -110,7 +115,7 @@ def run_test(client, directory, logger):
             send_repeat(client, f, dialog_request_id, logger)
 
             logger.log(f"In run_test:: Moving {f} to used_audio")
-            os.rename(f,  f"used_audio/{f.split('/')[-1]}")
+            os.rename(f,  f"used_samples/{f.split('/')[-1]}")
             counter += 1
 
         p = sp.Popen(f"convert_audio/convert_to_mono.sh {directory} converted_audio/", shell=True)
@@ -126,19 +131,19 @@ def send_test_audio(client, audio_file, id, logger):
     logger.log(f"In send_test_audio:: Sending {audio_file} to AVS server . . .")
     response = client.send_audio_file(open(audio_file, "rb"), dialog_request_id=id)
 
-    parse_response(response, f"word_response/{audio_file.split('/')[-1].split('.')[0]}.mp3", logger)
+    #parse_response(response, f"word_response/{audio_file.split('/')[-1].split('.')[0]}.mp3", logger)
 
 def send_exit(client, id, logger):
     logger.log(f"In send_exit:: Sending exit skill to AVS server . . .")
     response = client.send_audio_file(open(exit_skill, "rb"), dialog_request_id=id)
 
-    parse_response(response, f"word_response/exit_skill.mp3", logger)
+    #parse_response(response, f"word_response/exit_skill.mp3", logger)
 
 def send_repeat(client, audio_file, id, logger):
     logger.log(f"In send_repeat::  Sending exit skill to AVS server . . .")
     response = client.send_audio_file(open(repeat_last, "rb"), dialog_request_id=id)
 
-    parse_response(response, f"word_transcribe/{audio_file.split('/')[-1].split('.')[0]}.mp3", logger)
+    parse_response(response, f"{output_dir}/{audio_file.split('/')[-1].split('.')[0]}.mp3", logger)
 
 
 def parse_response(response, file_location, logger):
@@ -190,18 +195,32 @@ if __name__ == "__main__":
         base_url= 'alexa.na.gateway.devices.a2z.com', 
     )
 
+    parser = ArgumentParser()
+
+    parser.add_argument("input_directory", help = "Audio Samples for transcription.")
+    parser.add_argument("output_directory", help = "Alexa samples")
+
+    
+
+    args = parser.parse_args()
+
+    if not os.path.exists(args.output_directory):
+        os.mkdir(args.output_directory)
+
     l = Logger()
 
     l.log(f"In main:: Connecting", to_stdout = True)
     client.connect()
     l.log(f"In main:: Connected", to_stdout = True)
 
+
+
     skill_audio = "../bark-with-voice-clone/skill_output/"
     word_audio = "../bark-with-voice-clone/words_output/"
 
 
     # try:
-    run_test(client, word_audio, l)
+    run_test(client, args.input_directory, l, args.output_directory)
     # except Exception as e:
     #     print(e)
     #     print("Restarting . . .")

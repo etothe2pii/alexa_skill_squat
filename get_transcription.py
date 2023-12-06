@@ -262,14 +262,6 @@ def analyze_results_json(results_file):
         print(f"{most}: {most_count}")
 
 
-    print("\n\n\n\n")
-    print(high)
-    print(moderate)
-    print(mild)
-    print("\n")
-    print(len(high))
-    print(len(moderate))
-    print(len(mild))
 
 
     
@@ -289,7 +281,20 @@ if __name__ == "__main__":
     #do_analysis("raw_text/", "../bark-with-voice-clone/skills_clean.txt", "raw_results.txt")
 
 
+    #Comment this line out if you're doing it a bunch. No need to keep regenerating the same results file
 
-    # do_word_analysis("word_raw_text/", "../bark-with-voice-clone/words.txt", "words_results.txt")
-    analyze_results_json("words_results.txt")
+    parser = ArgumentParser()
+
+    parser.add_argument("input_directory", help = "Audio Samples for transcription.")
+    parser.add_argument("output_file", help = "Alexa samples")
+    parser.add_argument("--prompts", default="words.txt", help="prompt file used for generating audio")
+    parser.add_argument("--skip_analysis", action="store_true", help="Use this flag if the data hasn't changed. Stops the script from going through it all again.")
+
+    
+
+    args = parser.parse_args()
+
+    if not args.skip_analysis:
+        do_word_analysis(args.input_directory, args.prompts, args.output_file)
+    analyze_results_json(args.output_file)
 

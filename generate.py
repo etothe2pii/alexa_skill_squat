@@ -61,7 +61,7 @@ def create_audio(args):
             write_wav(filepath, SAMPLE_RATE, audio_array.astype(np.int16))
 
 
-def generate_many_voices(prompt_file, voices, start_at = 0, repetitions = 5, skip = 1, target_directory = "skill_output/", models = "new_models/"):
+def generate_many_voices(prompt_file, voices, start_at = 0, repetitions = 5, skip = 1, target_directory = "skill_output/", models = "./models/"):
 
     print("Loading models")
     preload_models(path=models)
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     parser.add_argument("--repetitions", type = int, help = "Number of times to repeat each prompt for each voice.", default=5)
     parser.add_argument("--skip", type=int, default = 1, help = "Number of lines to iterate on each repetition. Default is 1.")
     parser.add_argument("--output_directory", default = "output/", help = "Directory to store results in.")
-    parser.add_argument("--model_dir", default="models/", help="Models for voice generation directory.")
+    parser.add_argument("--model_directory", default = "./models", help = "Location of predownloaded models")
     args = parser.parse_args()
     # pf = sys.argv[1]
     # voices = sys.argv[2:]
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.output_directory):
         os.mkdir(args.output_directory)
 
-    generate_many_voices(args.promptFile, args.voices, start_at = last, repetitions=50, skip=1, target_directory="words_output/", models = args.model_dir)
+    generate_many_voices(args.promptFile, args.voices, start_at = last, repetitions=50, skip=1, target_directory="words_output/", models = args.model_directory)
 
 
 
