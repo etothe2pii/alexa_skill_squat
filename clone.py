@@ -13,15 +13,15 @@ def clone_voice(args):
     model = load_codec_model(use_gpu=True if device == 'cuda' else False)
 
     # From https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer
-    from hubert.hubert_manager import HuBERTManager
+    from bark_hubert_quantizer.hubert_manager import HuBERTManager
     hubert_manager = HuBERTManager()
     hubert_manager.make_sure_hubert_installed()
     hubert_manager.make_sure_tokenizer_installed()
 
     # From https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer 
     # Load HuBERT for semantic tokens
-    from hubert.pre_kmeans_hubert import CustomHubert
-    from hubert.customtokenizer import CustomTokenizer
+    from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
+    from bark_hubert_quantizer.customtokenizer import CustomTokenizer
 
     # Load the HuBERT model
     hubert_model = CustomHubert(checkpoint_path='data/models/hubert/hubert.pt').to(device)
@@ -51,23 +51,25 @@ def clone_voice(args):
 
 
     voice_name = args.voice_name # whatever you want the name of the voice to be
-    output_path = 'bark/assets/prompts/' + voice_name + '.npz'
+    output_path = args.output_directory + voice_name + '.npz'
     np.savez(output_path, fine_prompt=codes, coarse_prompt=codes[:2, :], semantic_prompt=semantic_tokens)
 
+
+#For if you don't want to do it a few times, since model loading takes a while
 def clone_several(names, seeds):
     device = 'cuda'
     model = load_codec_model(use_gpu=True if device == 'cuda' else False)
 
     # From https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer
-    from hubert.hubert_manager import HuBERTManager
+    from bark_hubert_quantizer.hubert_manager import HuBERTManager
     hubert_manager = HuBERTManager()
     hubert_manager.make_sure_hubert_installed()
     hubert_manager.make_sure_tokenizer_installed()
 
     # From https://github.com/gitmylo/bark-voice-cloning-HuBERT-quantizer 
     # Load HuBERT for semantic tokens
-    from hubert.pre_kmeans_hubert import CustomHubert
-    from hubert.customtokenizer import CustomTokenizer
+    from bark_hubert_quantizer.pre_kmeans_hubert import CustomHubert
+    from bark_hubert_quantizer.customtokenizer import CustomTokenizer
 
     # Load the HuBERT model
     hubert_model = CustomHubert(checkpoint_path='data/models/hubert/hubert.pt').to(device)
@@ -106,8 +108,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
 
     parser.add_argument("voice_name", help="Name of voice")
-    parser.add_argument("--seed", default = "seeds/scottish.wav", help="Seed audio")
+    parser.add_argument("seed", default = "seeds/scottish.wav", help="Seed audio")
     parser.add_argument("--disable_gpu", action="store_true", help="Shift to CPU compute")
+    parser.add_argument("--output_directory", default = "./", help = "Where to store the voice file")
     
     args = parser.parse_args()
 

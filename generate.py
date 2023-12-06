@@ -10,6 +10,7 @@ from argparse import ArgumentParser
 import numpy as np
 import sys
 import time
+import os
 
 from onepass import Wellford
 
@@ -60,10 +61,10 @@ def create_audio(args):
             write_wav(filepath, SAMPLE_RATE, audio_array.astype(np.int16))
 
 
-def generate_many_voices(prompt_file, voices, start_at = 0, repetitions = 5, skip = 1, target_directory = "skill_output/"):
+def generate_many_voices(prompt_file, voices, start_at = 0, repetitions = 5, skip = 1, target_directory = "skill_output/", models = "new_models/"):
 
     print("Loading models")
-    preload_models(path="new_models/")
+    preload_models(path=models)
     print("Finished loading models")
 
     
@@ -134,15 +135,28 @@ if __name__ == "__main__":
 
     # create_audio(args)
 
-    pf = sys.argv[1]
-    voices = sys.argv[2:]
+    parser = ArgumentParser()
+    parser.add_argument("promptFile",  help = "File with one prompt per line")
+    parser.add_argument("voices", nargs = "+", help="List of voices to generate")
+    parser.add_argument("--start_at", type = int, help = "Line number in prompt file to start at (starting with 0)", default=0)
+    parser.add_argument("--repetitions", type = int, help = "Number of times to repeat each prompt for each voice.", default=5)
+    parser.add_argument("--skip", type=int, default = 1, help = "Number of lines to iterate on each repetition. Default is 1.")
+    parser.add_argument("--output_directory", default = "output/", help = "Directory to store results in.")
+    parser.add_argument("--model_dir", default="models/", help="Models for voice generation directory.")
+    args = parser.parse_args()
+    # pf = sys.argv[1]
+    # voices = sys.argv[2:]
 
     #883 is where I increased the sample size
     last = 1226
 
-    # get_prompt_words(pf)
 
-    generate_many_voices(pf, voices, start_at = last, repetitions=50, skip=1, target_directory="words_output/")
+    # get_prompt_words(pf)
+    
+    if not os.path.exists(args.output_directory):
+        os.mkdir(args.output_directory)
+
+    generate_many_voices(args.promptFile, args.voices, start_at = last, repetitions=50, skip=1, target_directory="words_output/", models = args.model_dir)
 
 
 
