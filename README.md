@@ -4,6 +4,8 @@ Hey! This is a final project for an IOT Security course. I thought it would be f
 
 Note: There are a bunch of empty directories here. These are important, I promise. A lot of the scripts shuffle around the audio once they finish so that they can keep running without needing human interaction and without losing their place. I could make the code make them, but I'm being lazy.
 
+Just FYI, I know this code mostly works in my original development environment, but a lot of it seems to fall apart outside of that. If you would like a demonstration just to show that it all really does work, I'd be happy to set up a zoom call or something similar to demonstrate it to you.
+
 ## Setup
 
 First clone this repo.
@@ -46,6 +48,8 @@ python3 clone.py southern southern.wav
 Which will generate a `southern.npz` file.
 
 ### Generating Audio
+
+**So, I can't get this to work outside of my initial environment. I know I did a lot of messing with the package and some of the files, but it's not super clear what I did. This is about as close as I can get before the submission deadline.**
 
 This is the most time consuming part of the whole thing, at least for my computer. If you have a lot of compute available, the bottleneck may be the AVS client. We can do this using the generate.py script. This, for example, is using a single southern accent. We can pass any number of voices to the generate.py script for it to generate samples.
 
